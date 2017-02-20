@@ -92,7 +92,7 @@ int pin_pracovna = 6;
 
 //ČOV
 int stav_COV=0;
-int pin_COV = 53;
+int pin_COV = 2;
 long loopOn = 2700000; // time for RED
 long loopOff = 7200000; // time for BLUE + YELLOW
 long subLoopOn = 1200000; // time for YELLOW
@@ -385,24 +385,24 @@ Serial.println(T12);
 T14=teplota(34);
 Serial.print("ČOV vzduch ");
 Serial.println(T12);
-/*
-Tobyvak=teplota(48);
-Serial.print("obývák (48)");
+
+Tobyvak=teplota(49);
+Serial.print("obývák (49)");
 Serial.println(Tobyvak);
 
-Tloznice=teplota(49);
-Serial.print("ložnice (49)");
+Tloznice=teplota(5);
+Serial.print("ložnice (5)");
 Serial.println(Tloznice);
-*/
+
 Tpokoj=teplota(23);
 Serial.print("pokoj (23)");
 Serial.println(Tpokoj);
 /*
-Tpracovna=teplota(51);
-Serial.print("ČOV vzduch ");
-Serial.println(Tpracovna);
-*/
+Tpracovna=teplota(48);
+Serial.print("pracovna (48)");
+Serial.println(Tpracovna); 
 
+*/
     }
   }
   // teplota z DS18B20 - ty na destičce i ty vodotěsné
@@ -1647,7 +1647,7 @@ client.print("</tr>");
               client.print("<td  style='background-color:#00AFFF'>michani</td>");
             }else if (stav_COV == 4){
               client.print("<td></td>");
-                            client.print("<td>ver. 2.8</td>");
+                            client.print("<td>ver. 2.9</td>");
                                           client.print("<td>20. 2. 2017</td>"); // verze verze verze verze verze verze verze verze verze verze verze verze verze verze verze verze verze verze
             }
            }
@@ -1695,18 +1695,18 @@ client.print("</tr>");
                  client.print("<td>Otevreno</td>");
 
 if (topit_obyvak == true){
-  client.print("<td style='background-color:#FFD000>ANO</td>");  
+  client.print("<td style='background-color:#FFD00>ANO</td>");  
 } else {
     client.print("<td>NE</td>");
 }
 
 if (topit_pracovna == true){
-  client.print("<td style='background-color:#FFD000>ANO</td>");  
+  client.print("<td style='background-color:#FFD00>ANO</td>");  
 } else {
     client.print("<td>NE</td>");
 }
 if (topit_loznice == true){
-  client.print("<td style='background-color:#FFD000>ANO</td>");  
+  client.print("<td style='background-color:#FFD00>ANO</td>");  
 } else {
     client.print("<td>NE</td>");
 }
@@ -2145,7 +2145,9 @@ void aktualizacemM(){
 
 
 // změny -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
-/* 
+/* 2.9
+-oprava tabulky
+-aktivace teploměrů obývák, ložnice
  *  2.8 
  -přidány teploměry do místností
  -přidána regulace topení
