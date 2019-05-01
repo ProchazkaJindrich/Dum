@@ -1,109 +1,29 @@
+
+
+
+bool stopmM = true;
 //minima a maxima
-  bool stopmM = true;
-float m_Tvenku1 = 10000;
-float M_Tvenku1=-1000;
-float m_Hvenku1 =10000;
-float M_Hvenku1 =-1000;
-float m_Tvenku2 =10000;
-float M_Tvenku2 =-1000;
-float m_Pvenku2 =100000;
-float M_Pvenku2 =0;
-float m_Tkoupelna =10000;
-float M_Tkoupelna =0;
-float m_Hkoupelna =10000;
-float M_Hkoupelna =0;
-float m_Ttechnicka =10000;
-float M_Ttechnicka =0;
-float m_Htechnicka =1000;
-float M_Htechnicka =0;
-float m_Tzakrbem =10000;
-float M_Tzakrbem =0;
-float m_Hzakrbem =10000;
-float M_Hzakrbem =0;
-float m_Tspaliny =10000;
-float M_Tspaliny =0;
-float m_T1 =10000;
-float M_T1 =0;
-float m_T2 =10000;
-float M_T2 =0;
-float m_T3 =10000;
-float M_T3 =0;
-float m_T4 =10000;
-float M_T4 =0;
-float m_T5 =10000;
-float M_T5 =0;
-float m_T6 =10000;
-float M_T6 =0;
-float m_T7 =1000;
-float M_T7 =0;
-float m_T8 =1000;
-float M_T8 =0;
-float m_T9 =1000;
-float M_T9 =0;
-float m_T10 =1000;
-float M_T10 =0;
-float m_T11 =1000;
-float M_T11 =1;
-float m_T12 =1000;
-float M_T12 =0;
-float m_T13 =100;
-float M_T13 =0;
-float m_T14 =100;
-float M_T14 =0;
-float m_Tobyvak =100;
-float M_Tobyvak =0;
-float m_Tloznice =100;
-float M_Tloznice =0;
-float m_Tpokoj =100;
-float M_Tpokoj =0;
-float m_Tpracovna =100;
-float M_Tpracovna =0;
+
+float hodnoty[28];  
+/*0:tepltoa venku1, 1:vlhkost venku, 2:teplota venku2, 3:tlak venku, 4:teplota koupelna, 5:vlhkost koupelna, 
+ * 6:teplota technicka, 7:vlhkost technicka, 8:teplota za krbem, 9:vlhkost za krbem, 10:teplota spalin, 11:voda do vložky
+ * 12:zásobník1/4, 13:zásobník2/4, 14:zásobník3/4, 15:zásobník4/4, 16:podlaha obývák, 17:teplota dešťovka, 18:teplota vodoměr 
+ * 19:ze zásobníku do topení, 20:teplota přípojka starobinec, 21:kWh zasobnik, 22:výška destovky, 23:objem dešťovky, 24:krbova vložka
+ * 25:procento naplnění zásobníku
+*/
+
+float a15min_hodnoty[28];
+float a30min_hodnoty[28];
+float a6h_hodnoty[28];
+float a12h_hodnoty[28];
+
+float minima[28];
+float maxima[28];
+/*
+int pct_naplneny_zas = 0;
 int m_pct_naplneny_zas =100;
 int M_pct_naplneny_zas =0;
-float m_kWh_zas = 500;
-float M_kWh_zas = -500;
-
-
-int pct_naplneny_zas =0;
-float kWh_zas = 0;
-
-
-//ovladaní topení
-float teplota_zadana_H = 22.2;
-float teplota_zadana_D = 21.2;
-
-bool pozadavek_topit= false;
-bool pozadavek_kotel = false;
-bool pozadavek_zasobnik = false;
-bool topit_pokoj = false;
-bool topit_obyvak = false;
-bool topit_loznice = false;
-bool topit_pracovna = false;
-
-int pin_kotel =3;
-int pin_krb = 2;
-int pin_obyvak = 4;
-int pin_loznice = 5;
-int pin_pracovna = 6;
-
-
-
-
-
-//ČOV
-int stav_COV=0;
-int pin_COV = 2;
-long loopOn = 2700000; // time for RED
-long loopOff = 7200000; // time for BLUE + YELLOW
-long subLoopOn = 1200000; // time for YELLOW
-long subLoopOff = 5000; // time for BLUE
-
-
-bool stateMainLoop = false;
-bool stateSubLoop = false;
-
-unsigned long lastTimeMainLoop = 0;
-unsigned long lastTimeSubLoop = 0;
+*/
 
 
 #include <Arduino.h>
@@ -112,7 +32,7 @@ unsigned long lastTimeSubLoop = 0;
 #include <OneWire.h>
 #include <DallasTemperature.h>
 
-
+/*
 float T1 = 0; // voda DO VLOŽKY
 float T2 = 0; // zásobník 2/4
 float T3 = 0; // kotel vstup
@@ -127,12 +47,13 @@ float T11 = 0; // zásobník2/4
 float T12 = 0; // ze zásobníku do topená
 float T13 = 0; // podlaha pokoj nahoře
 float T14 = 0; // ČOV vzduch
+
 float Tobyvak = 0;
 float Tloznice =0;
 float Tpokoj = 0;
 float Tpracovna =0;
 
-
+*/
 // MAX 6675
 #include "max6675.h"
 
@@ -146,8 +67,17 @@ float Tpracovna =0;
 #include "i2c_MPL3115A2.h"
 MPL3115A2 mpl3115;
 
+// Ultrazvukový vodotěsný modul pro měření vzdálenosti
+// JSN-SR04T
 
-
+// připojení potřebné knihovny
+#include <NewPing.h>
+// nastavení propojovacích pinů
+#define pinTrigger    3
+#define pinEcho       4
+#define maxVzdalenost 450
+// inicializace měřícího modulu z knihovny
+NewPing sonar(pinTrigger, pinEcho, maxVzdalenost);
 
 
 
@@ -197,7 +127,7 @@ EthernetServer server(80);
 
 
 // proměnné
-
+/*
 float Tvenku1 =0;
 float Hvenku1 =0;
 float Ttechnicka = 0;
@@ -215,7 +145,7 @@ float Tzasobnik1 = 0;
 float Tzasobnik3 = 0;
 float Tzasobnik4=0;
 
-
+*/
 class ctiDHT
 {
   int  updateInterval;      // interval between updates
@@ -290,14 +220,14 @@ public:
   }
   Serial.println();
  
-Tvenku1 = t5;
-Hvenku1 = h5;
-Ttechnicka = t3;
-Htechnicka=h3;
-Tkoupelna =t4;
-Hkoupelna = h4;
-Tzakrbem = t2;
-Hzakrbem = h2;
+hodnoty[0] = t5;
+hodnoty[1] = h5;
+hodnoty[6] = t3;
+hodnoty[7]=h3;
+hodnoty[4] =t4;
+hodnoty[5]= h4;
+hodnoty[8] = t2;
+hodnoty[9] = h2;
 
 
   
@@ -307,6 +237,51 @@ Hzakrbem = h2;
     }
 
 };
+
+class Cti_destovka
+{
+int updateInterval;
+int interval;
+  public:
+Cti_destovka (int interval)
+  {
+    updateInterval = interval;
+  }
+  void Update()
+  {
+   
+  // načtení vzdálenosti v centimetrech do vytvořené proměnné vzdalenost
+  int vzdalenost = sonar.ping_cm();
+  // pauza před dalším měřením
+  delay(50);
+  // pokud byla detekována vzdálenost větší než 0,
+  // provedeme další měření
+  if (vzdalenost > 0) {
+    vzdalenost = 0;
+    // pro získání stabilnějších výsledků provedeme 5 měření
+    // a výsledky budeme přičítat do proměnné vzdalenost
+    for(int i=0; i<20; i++) {
+      vzdalenost += sonar.ping_cm();
+      delay(50);
+    }
+    // v proměnné vzdálenost máme součet posledních 5 měření
+    // a musíme tedy provést dělení 5 pro získání průměru
+    vzdalenost = vzdalenost/20;
+    // vytištění informací po sériové lince
+    Serial.print("Vzdalenost mezi senzorem a predmetem je ");
+    Serial.print(vzdalenost);
+    Serial.println(" cm.");
+    
+hodnoty[22] = vzdalenost;
+  }
+  // pokud byla detekována vzdálenost 0, je předmět mimo měřící rozsah,
+  // tedy příliš blízko nebo naopak daleko
+  else {
+    Serial.println("Vzdalenost mezi senzorem a predmetem je mimo merici rozsah.");
+    delay(500);
+  }
+ }
+  };
 
 
 
@@ -328,64 +303,62 @@ class ctiDS
     {
       lastUpdate = millis();
   
-
-  T1=teplota(29);
+hodnoty[11]=teplota(29);
   Serial.print("voda dovložky ");
-  Serial.println(T1);
+  Serial.println(hodnoty[11]);
 
-  T2=teplota(33);
+  hodnoty[14]=teplota(33);
 Serial.print("zásobník 3/4 ");
-Serial.println(T2);
+Serial.println(hodnoty[14]);
 
-  T3=teplota(25);
+ /* T3=teplota(25);
 Serial.print("kotel vstup ");
 Serial.println(T3);
 
 T4=teplota(26);
 Serial.print("kotel vystup ");
 Serial.println(T4);
-
-T5=teplota(22);
+*/
+hodnoty[16]=teplota(22);
 Serial.print("podlaha obyvak ");
-Serial.println(T5);
+Serial.println(hodnoty[16]);
 
-T6=teplota(31);
+hodnoty[12]=teplota(31);
 Serial.print("zasobnik 1/4 ");
-Serial.println(T6);
+Serial.println(hodnoty[12]);
 
-T7=teplota(32);
+hodnoty[15]=teplota(32);
 Serial.print("zasobnik 4/4 ");
-Serial.println(T7);
+Serial.println(hodnoty[15]);
 
-T8=teplota(28);
+hodnoty[24]=teplota(28);
 Serial.print("krbová bložka ");
-Serial.println(T8);
+Serial.println(hodnoty[24]);
 
-T9=teplota(35);
-Serial.print("voda ČOV ");
-Serial.println(T9);
+hodnoty[20]=teplota(35);
+Serial.print("přípojka starobinec ");
+Serial.println(hodnoty[20]);
 
-  
-T10=teplota(36);
+hodnoty[18]=teplota(36);
 Serial.print("vodomer ");
-Serial.println(T10);  
+Serial.println(hodnoty[18]);  
 
-T11=teplota(30);
+hodnoty[13]=teplota(30);
 Serial.print("zasobnik 2/4 ");
-Serial.println(T11);
+Serial.println(hodnoty[13]);
 
-T12=teplota(27);
+hodnoty[19]=teplota(27);
 Serial.print("ze zasobniku do topeni ");
-Serial.println(T12);
+Serial.println(hodnoty[19]);
 
-T13=teplota(24);
-Serial.print("pokoj nahoře ");
-Serial.println(T12);
+hodnoty[13]=teplota(24);
+Serial.print("pokoj nahoře podlaha??? ");
+Serial.println(hodnoty[13]);
 
-T14=teplota(34);
-Serial.print("ČOV vzduch ");
-Serial.println(T12);
-
+hodnoty[17]=teplota(34);
+Serial.print("teplota destovka ");
+Serial.println(hodnoty[17]);
+/*
 Tobyvak=teplota(49);
 Serial.print("obývák (49)");
 Serial.println(Tobyvak);
@@ -397,11 +370,10 @@ Serial.println(Tloznice);
 Tpokoj=teplota(23);
 Serial.print("pokoj (23)");
 Serial.println(Tpokoj);
-/*
+
 Tpracovna=teplota(48);
 Serial.print("pracovna (48)");
 Serial.println(Tpracovna); 
-
 */
     }
   }
@@ -459,68 +431,66 @@ class smazmM
     if((millis() - lastUpdate) > updateInterval)  // time to update
     {
       lastUpdate = millis();
- m_Tvenku1 = 10000;
- M_Tvenku1=-1000;
- m_Hvenku1 =10000;
- M_Hvenku1 =-1000;
- m_Tvenku2 =10000;
- M_Tvenku2 =-1000;
- m_Pvenku2 =100000;
- M_Pvenku2 =0;
- m_Tkoupelna =10000;
- M_Tkoupelna =0;
- m_Hkoupelna =10000;
- M_Hkoupelna =0;
- m_Ttechnicka =10000;
- M_Ttechnicka =0;
- m_Htechnicka =1000;
- M_Htechnicka =0;
- m_Tzakrbem =10000;
- M_Tzakrbem =0;
- m_Hzakrbem =10000;
- M_Hzakrbem =0;
- m_Tspaliny =10000;
- M_Tspaliny =0;
- m_T1 =10000;
- M_T1 =0;
- m_T2 =10000;
- M_T2 =0;
- m_T3 =10000;
- M_T3 =0;
- m_T4 =10000;
- M_T4 =0;
- m_T5 =10000;
- M_T5 =0;
- m_T6 =10000;
- M_T6 =0;
- m_T7 =1000;
- M_T7 =0;
- m_T8 =1000;
- M_T8 =0;
- m_T9 =1000;
- M_T9 =0;
- m_T10 =1000;
- M_T10 =0;
- m_T11 =1000;
- M_T11 =1;
- m_T12 =1000;
- M_T12 =0;
- m_T13 =100;
- M_T13 =0;
- m_T14 =100;
- M_T14 =0;
-m_pct_naplneny_zas =100;
-M_pct_naplneny_zas =0;
- m_kWh_zas = 500;
- M_kWh_zas = -500;   
-m_Tobyvak =100;
- M_Tobyvak =0;
- m_Tloznice =100;
- M_Tloznice =0;
- m_Tpokoj =100;
- M_Tpokoj =0;
- m_Tpracovna =100;
- M_Tpracovna =0;
+      for (int i = 0; i++; 28)
+      {
+        minima [i] = 1000;
+        maxima[i] = -1000;
+      }
+
+
+    }
+  }
+};
+
+// hodnota pulhodiny stara
+class a30min
+{
+  unsigned long  updateInterval;      // interval between updates
+  unsigned long lastUpdate; // last update of position
+ 
+ public: 
+  a30min(unsigned long interval)
+  {
+    updateInterval = interval;
+  }
+    void Update()
+  {
+    if((millis() - lastUpdate) > updateInterval)  // time to update
+    {
+      lastUpdate = millis();
+      for (int i = 0; i++; 28)
+      {
+        a30min_hodnoty[i] = a15min_hodnoty[i];
+        a15min_hodnoty [i] = hodnoty[i];
+        
+      }
+
+    }
+  }
+};
+
+// hodnota pulhodiny stara
+class a12hodin
+{
+  unsigned long  updateInterval;      // interval between updates
+  unsigned long lastUpdate; // last update of position
+ 
+ public: 
+  a12hodin(unsigned long interval)
+  {
+    updateInterval = interval;
+  }
+    void Update()
+  {
+    if((millis() - lastUpdate) > updateInterval)  // time to update
+    {
+      lastUpdate = millis();
+      for (int i = 0; i++; 28)
+      {
+        a12h_hodnoty[i] = a6h_hodnoty[i];
+        a6h_hodnoty [i] = hodnoty[i];
+        
+      }
 
     }
   }
@@ -543,69 +513,13 @@ class smazmM_jednou
     if(((millis() - lastUpdate) > updateInterval)&& stopmM)  // time to update
     {
       lastUpdate = millis();
-      stopmM=false;
- m_Tvenku1 = 10000;
- M_Tvenku1=-1000;
- m_Hvenku1 =10000;
- M_Hvenku1 =-1000;
- m_Tvenku2 =10000;
- M_Tvenku2 =-1000;
- m_Pvenku2 =100000;
- M_Pvenku2 =0;
- m_Tkoupelna =10000;
- M_Tkoupelna =0;
- m_Hkoupelna =10000;
- M_Hkoupelna =0;
- m_Ttechnicka =10000;
- M_Ttechnicka =0;
- m_Htechnicka =1000;
- M_Htechnicka =0;
- m_Tzakrbem =10000;
- M_Tzakrbem =0;
- m_Hzakrbem =10000;
- M_Hzakrbem =0;
- m_Tspaliny =10000;
- M_Tspaliny =0;
- m_T1 =10000;
- M_T1 =0;
- m_T2 =10000;
- M_T2 =0;
- m_T3 =10000;
- M_T3 =0;
- m_T4 =10000;
- M_T4 =0;
- m_T5 =10000;
- M_T5 =0;
- m_T6 =10000;
- M_T6 =0;
- m_T7 =1000;
- M_T7 =0;
- m_T8 =1000;
- M_T8 =0;
- m_T9 =1000;
- M_T9 =0;
- m_T10 =1000;
- M_T10 =0;
- m_T11 =1000;
- M_T11 =1;
- m_T12 =1000;
- M_T12 =0;
- m_T13 =100;
- M_T13 =0;
- m_T14 =100;
- M_T14 =0;
-m_pct_naplneny_zas =100;
-M_pct_naplneny_zas =0;
- m_kWh_zas = 500;
- M_kWh_zas = -500; 
- m_Tobyvak =100;
- M_Tobyvak =0;
- m_Tloznice =100;
- M_Tloznice =0;
- m_Tpokoj =100;
- M_Tpokoj =0;
- m_Tpracovna =100;
- M_Tpracovna =0;  
+      stopmM=false;      
+      
+      for (int i = 0; i++; 28)
+      {
+        minima [i] = 1000;
+        maxima[i] = -1000;
+      }
 
     }
   }
@@ -650,136 +564,8 @@ mpl3115.awaitMeasurement();
     Serial.print(temperature);
     Serial.println("");
 
-Tvenku2 = temperature;
-Pvenku2 = pressure;
-
-    }
-  }
-};
-
-class topeni
-{
-  unsigned long  updateInterval;      // interval between updates
-  unsigned long lastUpdate; // last update of position
- 
- public: 
-  topeni(unsigned long interval)
-  {
-    updateInterval = interval;
-  }
-    void Update()
-  {
-    if((millis() - lastUpdate) > updateInterval)  // time to update
-    {
-      lastUpdate = millis();
-
-// požadavek topit
-//pokoj      
-if(Tpokoj<teplota_zadana_D){
-  topit_pokoj = true;
-}
-else if (Tpokoj>teplota_zadana_H) {
-  topit_pokoj = false;
-  
-}
-else {
-  topit_pokoj = false;
-}
-
-//pracovna      
-if(Tpracovna<teplota_zadana_D){
-  topit_pracovna = true;
-}
-else if (Tpracovna>teplota_zadana_H) {
-  topit_pracovna = false;
-  
-}
-else {
-  topit_pracovna = false;
-}
-//obyvak      
-if(Tobyvak<teplota_zadana_D){
-  topit_obyvak = true;
-}
-else if (Tobyvak>teplota_zadana_H) {
-  topit_obyvak = false;
-  
-}
-else {
-  topit_obyvak = false;
-}
-
-//loznice      
-if(Tloznice<teplota_zadana_D){
-  topit_loznice = true;
-}
-else if (Tloznice>teplota_zadana_H) {
-  topit_loznice = false;
-  
-}
-else {
-  topit_loznice = false;
-}
-      
-
-      if (topit_pokoj ==true || topit_obyvak == true|| topit_pracovna==true|| topit_loznice ==true){
-        pozadavek_topit = true;
-      }
-      else {
-        pozadavek_topit = false;
-      }
-      if (T6 >35) {
-        pozadavek_kotel = false;
-        pozadavek_zasobnik = true;
-             }
-             else {
-              pozadavek_kotel = true;
-              pozadavek_zasobnik = false;
-             }
-
-
-// zapínání pinů
-
-//zapínání zdroje
-if (pozadavek_topit == true){
- if (pozadavek_zasobnik == true){
-  digitalWrite (pin_krb, HIGH);
-  digitalWrite (pin_kotel, LOW);
- } else  if (pozadavek_kotel == true){
-  digitalWrite (pin_krb, LOW);
-  digitalWrite (pin_kotel, HIGH);
- } 
-}
-
-
-// otevírání ventilů
-if (pozadavek_topit == true){
- if (topit_obyvak == true){
-  digitalWrite (pin_obyvak, HIGH);
- } 
- else {
-  digitalWrite (pin_obyvak, LOW);  
- }
- if (topit_pracovna == true){
-  digitalWrite (pin_pracovna, HIGH);
- } 
- else {
-  digitalWrite (pin_pracovna, LOW);  
- }
- if (topit_loznice == true){
-  digitalWrite (pin_loznice, HIGH);
- } 
- else {
-  digitalWrite (pin_loznice, LOW);  
- }
-}
-
-// vypnutí topení
-if (pozadavek_topit == false){
-  digitalWrite (pin_krb, LOW);
-  digitalWrite (pin_kotel, LOW);
-}
-
+hodnoty[2] = temperature;
+hodnoty[3] = pressure;
 
     }
   }
@@ -835,51 +621,70 @@ client.print("<table>");
     client.print("<th style='background-color:#0AA0AA;color:#FFFFFF'>Hodnota</th>");
         client.print("<th style='background-color:#0AA0AA;color:#FFFFFF'>Minimum</th>");
             client.print("<th style='background-color:#0AA0AA;color:#FFFFFF'>Maximum</th>");
+                        client.print("<th style='background-color:#0AA0AA;color:#FFFFFF'>15-30 minut</th>");
+                                    client.print("<th style='background-color:#0AA0AA;color:#FFFFFF'>6-12 hodin</th>");
     client.print("<th style='background-color:#0AA0AA;color:#FFFFFF'>Jednotka</th>");
   client.print("</tr>");
   client.print("<tr> ");
     client.print("<td>Teplota venku 1</td>");
-    if (Tvenku1>0){
+    if (hodnoty[0]>0){
            client.print( "<td>");
-           client.print(Tvenku1);
+           client.print(hodnoty[0]);
           client.print(" </td>");
     }
     else{
       client.print("<td style='background-color:#00AFFF'>");
-      client.print(Tvenku1);
+      client.print(hodnoty[0]);
       client.print("</td>"); //modrá
     }
 
         client.print("<td>");
-    client.print(m_Tvenku1);
+    client.print(minima[0]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_Tvenku1);
+    client.print(maxima[0]);
     client.print("</td>");
       client.print("<td>\377C</td>");
+
+              client.print("<td>");
+    client.print(a30min_hodnoty[0]);
+    client.print("</td>");
+      client.print("<td>\377C</td>");
+
+              client.print("<td>");
+    client.print(a12h_hodnoty[0]);
+    client.print("</td>");
+      client.print("<td>\377C</td>"); 
       
   client.print("</tr>");
     client.print("<tr>"); 
     client.print("<td>Teplota venku 2</td>");
-    if (Tvenku1>0){
+    if (hodnoty[2]>0){
             client.print("<td>");
-            client.print(Tvenku2);
+            client.print(hodnoty[2]);
             client.print("</td>");
     }
     else{
       client.print("<td style='background-color:#00AFFF'>");
-      client.print(Tvenku2);
+      client.print(hodnoty[2]);
       client.print("</td>"); //modrá
     }
     client.print("<td>");
-    client.print(m_Tvenku2);
+    client.print(minima[2]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_Tvenku2);
+    client.print(maxima[2]);
     client.print("</td>");
-    
+
+            client.print("<td>");
+    client.print(a30min_hodnoty[2]);
+    client.print("</td>");
+
+            client.print("<td>");
+    client.print(a12h_hodnoty[2]);
+    client.print("</td>");
       client.print("<td>\377C</td>");
       
   client.print("</tr>");
@@ -889,33 +694,48 @@ client.print("<table>");
     client.print("<tr>");
       client.print("<td>Vlhkost venku1</td>");
            client.print( "<td>");
-           client.print(Hvenku1);
+           client.print(hodnoty[1]);
            client.print("</td>");
                           client.print("<td>");
-    client.print(m_Hvenku1);
+    client.print(minima[1]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_Hvenku1);
+    client.print(maxima[1]);
     client.print("</td>");
 
+        client.print("<td>");
+    client.print(a30min_hodnoty[1]);
+    client.print("</td>");
+
+            client.print("<td>");
+    client.print(a12h_hodnoty[1]);
+    client.print("</td>");
       client.print("<td>% rel.</td>");
     client.print("</tr>");
 
     client.print("<tr>");
       client.print("<td>Tlak venku 2</td>");
            client.print( "<td>");
-           client.print(Pvenku2);
+           client.print(hodnoty[3]);
            client.print("</td>");
 
 
                client.print("<td>");
-    client.print(m_Pvenku2);
+    client.print(minima[3]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_Pvenku2);
+    client.print(maxima[3]);
     client.print("</td>");
+           client.print("<td>");
+    client.print(a30min_hodnoty[3]);
+    client.print("</td>");
+    
+           client.print("<td>");
+    client.print(a12h_hodnoty[3]);
+    client.print("</td>");
+    
       client.print("<td>Pa</td>");
     client.print("</tr>");
 
@@ -933,34 +753,42 @@ client.print("<table>");
       client.print("<tr>");
         client.print("<td>Spaliny</td>");
 
-        if (Tspaliny>380){
+        if (hodnoty[10]>380){
           client.print("<td style='background-color:#FF0000'>");
-          client.print(Tspaliny);
+          client.print(hodnoty[10]);
           client.print("</td>");
         }
-        else if (Tspaliny<380 && Tspaliny>280){
+        else if (hodnoty[10]<380 && hodnoty[10]>280){
           client.print("<td style='background-color:#00FF00'>");
-          client.print(Tspaliny);
+          client.print(hodnoty[10]);
           client.print("</td>");
         }
-        else if (Tspaliny<=280 && Tspaliny>=50){
+        else if (hodnoty[10]<=280 && hodnoty[10]>=50){
           client.print("<td style='background-color:#00AFFF'>");
-          client.print(Tspaliny);
+          client.print(hodnoty[10]);
           client.print("</td>");
         }
-                else if (Tspaliny<50){
+                else if (hodnoty[10]<50){
           client.print("<td>");
-          client.print(Tspaliny);
+          client.print(hodnoty[10]);
           client.print("</td>");
         }
                        client.print("<td>");
-    client.print(m_Tspaliny);
+    client.print(minima[10]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_Tspaliny);
+    client.print(maxima[10]);
     client.print("</td>");
- 
+
+ client.print("<td>");
+    client.print(a30min_hodnoty[10]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[10]);
+    client.print("</td>");
+    
         client.print("<td>\377C</td>");
       client.print("</tr>");
 
@@ -971,36 +799,45 @@ client.print("<table>");
 
 
   //T6 + T2 +T11+ T7
-  float prumerna_teplota_zas= ((T6 +T2+ T11 +T7)/4);
-pct_naplneny_zas= (100 *((prumerna_teplota_zas-25)/35));
-kWh_zas = ((prumerna_teplota_zas -25)*0.8);
+  float prumerna_teplota_zas= ((hodnoty[12] +hodnoty[13]+ hodnoty[14] +hodnoty[15])/4);
+int pct_naplneny_zas= (100 *((prumerna_teplota_zas-25)/35));
+int kWh_zas = ((prumerna_teplota_zas -25)*0.8);
+hodnoty[25] = pct_naplneny_zas;
+hodnoty[21] = kWh_zas;
 
   
       // zásobník naplnění %
       client.print("<tr>");
         client.print("<td>Naplneni zasobniku</td>");
 
-        if (pct_naplneny_zas>100){
+        if (hodnoty[25]>100){
           client.print("<td style='background-color:#FF0000'>");
-          client.print(pct_naplneny_zas);
+          client.print(hodnoty[25]);
           client.print("</td>");
         }
-        else if (pct_naplneny_zas<=100 && pct_naplneny_zas>30){
+        else if (hodnoty[25]<=100 && hodnoty[25]>30){
           client.print("<td style='background-color:#00FF00'>");
-          client.print(pct_naplneny_zas);
+          client.print(hodnoty[25]);
           client.print("</td>");
         }
-        else if (pct_naplneny_zas<=30){
+        else if (hodnoty[25]<=30){
           client.print("<td style='background-color:#00AFFF'>");
-          client.print(pct_naplneny_zas);
+          client.print(hodnoty[25]);
           client.print("</td>");
         }
                      client.print("<td>");
-    client.print(m_pct_naplneny_zas);
+    client.print(minima[25]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_pct_naplneny_zas);
+    client.print(maxima[25]);
+    client.print("</td>");
+    
+     client.print(a30min_hodnoty[25]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[25]);
     client.print("</td>");
 
               client.print("<td>%</td>");
@@ -1012,16 +849,24 @@ kWh_zas = ((prumerna_teplota_zas -25)*0.8);
 
         
           client.print("<td>");
-          client.print(kWh_zas);
+          client.print(hodnoty[21]);
           client.print("</td>");
       
      client.print("<td>");
-    client.print(m_kWh_zas);
+    client.print(minima[21]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_kWh_zas);
+    client.print(maxima[21]);
     client.print("</td>");
+
+        client.print(a30min_hodnoty[21]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[21]);
+    client.print("</td>");
+    
               client.print("<td>kWh</td>");
       client.print("</tr>");      
   
@@ -1031,28 +876,37 @@ kWh_zas = ((prumerna_teplota_zas -25)*0.8);
       client.print("<tr>");
         client.print("<td>Zasobnik 1/4</td>");
 
-        if (T6>60){
+        if (hodnoty[12]>60){
           client.print("<td style='background-color:#FFD000'>");
-          client.print(T6);
+          client.print(hodnoty[12]);
           client.print("</td>");
         }
-        else if (T6<=60 && T6>30){
+        else if (hodnoty[12]<=60 && hodnoty[12]>30){
           client.print("<td style='background-color:#00FF00'>");
-          client.print(T6);
+          client.print(hodnoty[12]);
           client.print("</td>");
         }
-        else if (T6<=30){
+        else if (hodnoty[12]<=30){
           client.print("<td style='background-color:#00AFFF'>");
-          client.print(T6);
+          client.print(hodnoty[12]);
           client.print("</td>");
         }
              client.print("<td>");
-    client.print(m_T6);
+    client.print(minima[12]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_T6);
+    client.print(maxima[12]);
     client.print("</td>");
+
+                 client.print("<td>");
+    client.print(a30min_hodnoty[12]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[12]);
+    client.print("</td>");
+    
               client.print("<td>\377C</td>");
       client.print("</tr>");
 
@@ -1060,59 +914,76 @@ kWh_zas = ((prumerna_teplota_zas -25)*0.8);
       client.print("<tr>");
         client.print("<td>Zasobnik 2/4</td>");
 
-        if (T2>60){
+               if (hodnoty[13]>60){
           client.print("<td style='background-color:#FFD000'>");
-          client.print(T2);
+          client.print(hodnoty[13]);
           client.print("</td>");
         }
-        else if (T2<=60 && T2>30){
+        else if (hodnoty[13]<=60 && hodnoty[13]>30){
           client.print("<td style='background-color:#00FF00'>");
-          client.print(T2);
+          client.print(hodnoty[13]);
           client.print("</td>");
         }
-        else if (T2<=30){
+        else if (hodnoty[13]<=30){
           client.print("<td style='background-color:#00AFFF'>");
-          client.print(T2);
+          client.print(hodnoty[13]);
           client.print("</td>");
         }
-        client.print("<td>");
-    client.print(m_T2);
+             client.print("<td>");
+    client.print(minima[13]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_T2);
+    client.print(maxima[13]);
+    client.print("</td>");
+
+                 client.print("<td>");
+    client.print(a30min_hodnoty[13]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[13]);
     client.print("</td>");
     
-        client.print("<td>\377C</td>");
+              client.print("<td>\377C</td>");
       client.print("</tr>");
 
       // zásobník 3/4 T11
       client.print("<tr>");
         client.print("<td>Zasobnik 3/4</td>");
 
-        if (T11>60){
+                if (hodnoty[14]>60){
           client.print("<td style='background-color:#FFD000'>");
-          client.print(T11);
+          client.print(hodnoty[14]);
           client.print("</td>");
         }
-        else if (T11<=60 && T11>30){
+        else if (hodnoty[14]<=60 && hodnoty[14]>30){
           client.print("<td style='background-color:#00FF00'>");
-          client.print(T11);
+          client.print(hodnoty[14]);
           client.print("</td>");
         }
-        else if (T11<=30){
+        else if (hodnoty[14]<=30){
           client.print("<td style='background-color:#00AFFF'>");
-          client.print(T11);
+          client.print(hodnoty[14]);
           client.print("</td>");
         }
-        client.print("<td>");
-    client.print(m_T11);
+             client.print("<td>");
+    client.print(minima[14]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_T11);
+    client.print(maxima[14]);
     client.print("</td>");
-        client.print("<td>\377C</td>");
+
+                 client.print("<td>");
+    client.print(a30min_hodnoty[14]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[14]);
+    client.print("</td>");
+    
+              client.print("<td>\377C</td>");
       client.print("</tr>");
        
 
@@ -1120,31 +991,38 @@ kWh_zas = ((prumerna_teplota_zas -25)*0.8);
       client.print("<tr>");
         client.print("<td>Zasobnik 4/4</td>");
 
-        if (T7>60){
+                if (hodnoty[15]>60){
           client.print("<td style='background-color:#FFD000'>");
-          client.print(T7);
+          client.print(hodnoty[15]);
           client.print("</td>");
         }
-        else if (T7<=60 && T7>30){
+        else if (hodnoty[15]<=60 && hodnoty[15]>30){
           client.print("<td style='background-color:#00FF00'>");
-          client.print(T7);
+          client.print(hodnoty[15]);
           client.print("</td>");
         }
-        else if (T7<=30){
+        else if (hodnoty[15]<=30){
           client.print("<td style='background-color:#00AFFF'>");
-          client.print(T7);
+          client.print(hodnoty[15]);
           client.print("</td>");
         }
-
-        client.print("<td>");
-    client.print(m_T7);
+             client.print("<td>");
+    client.print(minima[15]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_T7);
+    client.print(maxima[15]);
+    client.print("</td>");
+
+                 client.print("<td>");
+    client.print(a30min_hodnoty[15]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[15]);
     client.print("</td>");
     
-        client.print("<td>\377C</td>");
+              client.print("<td>\377C</td>");
       client.print("</tr>");
 
 
@@ -1153,33 +1031,41 @@ kWh_zas = ((prumerna_teplota_zas -25)*0.8);
       client.print("<tr>");
         client.print("<td>Vstup do vlozky</td>");
 
-        if (T1>70){
+        if (hodnoty[11]>70){
           client.print("<td style='background-color:#FF0000'>");
-          client.print(T1);
+          client.print(hodnoty[11]);
           client.print("</td>");
         }
-        else if (T1<=70 && T1>45){
+        else if (hodnoty[11]<=70 && hodnoty[11]>45){
           client.print("<td style='background-color:#00FF00'>");
-          client.print(T1);
+          client.print(hodnoty[11]);
           client.print("</td>");
         }
-        else if (T1<=45 && T1 > 25){
+        else if (hodnoty[11]<=45 && hodnoty[11] > 25){
           client.print("<td style='background-color:#00AFFF'>");
-          client.print(T1);
+          client.print(hodnoty[11]);
           client.print("</td>");
         } 
-         else if (T1<=25){
+         else if (hodnoty[11]<=25){
           client.print("<td>");
-          client.print(T1);
+          client.print(hodnoty[11]);
           client.print("</td>");
         } 
 
         client.print("<td>");
-    client.print(m_T1);
+    client.print(minima[11]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_T1);
+    client.print(maxima[11]);
+    client.print("</td>");
+
+            client.print("<td>");
+    client.print(a30min_hodnoty[11]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[11]);
     client.print("</td>");
     
         client.print("<td>\377C</td>");
@@ -1189,33 +1075,42 @@ kWh_zas = ((prumerna_teplota_zas -25)*0.8);
       client.print("<tr>");
         client.print("<td>Krbova vlozka</td>");
 
-        if (T8>75){
+        if (hodnoty[24]>75){
           client.print("<td style='background-color:#FF0000'>");
-          client.print(T8);
+          client.print(hodnoty[24]);
           client.print("</td>");
         }
-        else if (T8<=75 && T8>55){
+        else if (hodnoty[24]<=75 && hodnoty[24]>55){
           client.print("<td style='background-color:#00FF00'>");
-          client.print(T8);
+          client.print(hodnoty[24]);
           client.print("</td>");
         }
-        else if (T8<=55 && T8 > 25){
+        else if (hodnoty[24]<=55 && hodnoty[24] > 25){
           client.print("<td style='background-color:#00AFFF'>");
-          client.print(T8);
+          client.print(hodnoty[24]);
           client.print("</td>");
         } 
-         else if (T8<=25){
+         else if (hodnoty[24]<=25){
           client.print("<td>");
-          client.print(T8);
+          client.print(hodnoty[24]);
           client.print("</td>");
         } 
         client.print("<td>");
-    client.print(m_T8);
+    client.print(minima[24]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_T8);
+    client.print(maxima[24]);
     client.print("</td>");
+
+        client.print("<td>");
+    client.print(a30min_hodnoty[24]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[24]);
+    client.print("</td>");
+    
         client.print("<td>\377C</td>");
       client.print("</tr>"); 
 
@@ -1226,235 +1121,90 @@ client.print("</tr>");
       client.print("<tr>");
         client.print("<td>Do topeni ze zasobniku</td>");
 
-        if (T12>40){
+        if (hodnoty[19]>40){
           client.print("<td style='background-color:#FF0000'>");
-          client.print(T12);
+          client.print(hodnoty[19]);
           client.print("</td>");
         }
-        else if (T12<=40 && T12>30){
+        else if (hodnoty[19]<=40 && hodnoty[19]>30){
           client.print("<td style='background-color:#00FF00'>");
-          client.print(T12);
+          client.print(hodnoty[19]);
           client.print("</td>");
         }
 
-         else if (T12<=30){
+         else if (hodnoty[19]<=30){
           client.print("<td>");
-          client.print(T12);
+          client.print(hodnoty[19]);
           client.print("</td>");
         } 
 
         client.print("<td>");
-    client.print(m_T12);
+    client.print(minima[19]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_T12);
+    client.print(maxima[19]);
     client.print("</td>");
-    
+
+        client.print("<td>");
+    client.print(a30min_hodnoty[19]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[19]);
+    client.print("</td>");
+        
         client.print("<td>\377C</td>");
       client.print("</tr>"); 
 
 client.print("<tr>");
 client.print("</tr>");
 
-
-//kotel vstup
+//technická místnost
     client.print("<tr>");
-      client.print("<td>Kotel vstup</td>");
+      client.print("<td>Technicka</td>");
            client.print( "<td>");
-           client.print(T4);
+           client.print(hodnoty[6]);
            client.print("</td>");
 
            client.print("<td>");
-    client.print(m_T4);
+    client.print(minima[6]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_T4);
+    client.print(maxima[6]);
     client.print("</td>");
-      client.print("<td>\377C</td>");
-    client.print("</tr>");
-
-//kotel vystup
-    client.print("<tr>");
-      client.print("<td>Kotel vystup</td>");
-           client.print( "<td>");
-           client.print(T3);
-           client.print("</td>");
 
            client.print("<td>");
-    client.print(m_T3);
+    client.print(a30min_hodnoty[6]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_T3);
-    client.print("</td>");
-    
-      client.print("<td>\377C</td>");
-    client.print("</tr>");
-
-        client.print("<td> </td>");
-        client.print("<td> </td>");
-                client.print("<td> </td>");
-            client.print("<td> </td>");
-            client.print("<td> </td>");
-     client.print("</tr>");
-
-// pokoje
-//obyvak
-      client.print("<tr>");
-        client.print("<td>Obyvak</td>");
-
-        if (Tobyvak>teplota_zadana_H){
-          client.print("<td style='background-color:#FFD000'>");
-          client.print(Tobyvak);
-          client.print("</td>");
-        }
-        else if (Tobyvak<=teplota_zadana_H && Tobyvak>teplota_zadana_D){
-          client.print("<td style='background-color:#00FF00'>");
-          client.print(Tobyvak);
-          client.print("</td>");
-        }
-        else if (Tobyvak<=teplota_zadana_D){
-          client.print("<td style='background-color:#00AFFF'>");
-          client.print(Tobyvak);
-          client.print("</td>");
-        }
-
-        client.print("<td>");
-    client.print(m_Tobyvak);
-    client.print("</td>");
-
-        client.print("<td>");
-    client.print(M_Tobyvak);
+    client.print(a12h_hodnoty[6]);
     client.print("</td>");
     
-        client.print("<td>\377C</td>");
-      client.print("</tr>");
-
-
-//pokoj
-      client.print("<tr>");
-        client.print("<td>pokoj</td>");
-
-        if (Tpokoj>teplota_zadana_H){
-          client.print("<td style='background-color:#FFD000'>");
-          client.print(Tpokoj);
-          client.print("</td>");
-        }
-        else if (Tpokoj<=teplota_zadana_H && Tpokoj>teplota_zadana_D){
-          client.print("<td style='background-color:#00FF00'>");
-          client.print(Tpokoj);
-          client.print("</td>");
-        }
-        else if (Tpokoj<=teplota_zadana_D){
-          client.print("<td style='background-color:#00AFFF'>");
-          client.print(Tpokoj);
-          client.print("</td>");
-        }
-
-        client.print("<td>");
-    client.print(m_Tpokoj);
-    client.print("</td>");
-
-        client.print("<td>");
-    client.print(M_Tpokoj);  
-        client.print("</td>");
-      client.print("<td>\377C</td>");
-    client.print("</tr>");
-
-//loznice
-      client.print("<tr>");
-        client.print("<td>loznice</td>");
-
-        if (Tloznice>teplota_zadana_H){
-          client.print("<td style='background-color:#FFD000'>");
-          client.print(Tloznice);
-          client.print("</td>");
-        }
-        else if (Tloznice<=teplota_zadana_H && Tloznice>teplota_zadana_D){
-          client.print("<td style='background-color:#00FF00'>");
-          client.print(Tloznice);
-          client.print("</td>");
-        }
-        else if (Tloznice<=teplota_zadana_D){
-          client.print("<td style='background-color:#00AFFF'>");
-          client.print(Tloznice);
-          client.print("</td>");
-        }
-
-        client.print("<td>");
-    client.print(m_Tloznice);
-    client.print("</td>");
-
-        client.print("<td>");
-    client.print(M_Tloznice);
-        client.print("</td>");
-      client.print("<td>\377C</td>");
-    client.print("</tr>");
-
-
-//pracovna
-      client.print("<tr>");
-        client.print("<td>pracovna</td>");
-
-        if (Tpracovna>teplota_zadana_H){
-          client.print("<td style='background-color:#FFD000'>");
-          client.print(Tpracovna);
-          client.print("</td>");
-        }
-        else if (Tpracovna<=teplota_zadana_H && Tpracovna>teplota_zadana_D){
-          client.print("<td style='background-color:#00FF00'>");
-          client.print(Tpracovna);
-          client.print("</td>");
-        }
-        else if (Tpracovna<=teplota_zadana_D){
-          client.print("<td style='background-color:#00AFFF'>");
-          client.print(Tpracovna);
-          client.print("</td>");
-        }
-
-        client.print("<td>");
-    client.print(m_Tpracovna);
-    client.print("</td>");
-
-        client.print("<td>");
-    client.print(M_Tpracovna);
-    client.print("</td>");
-    
-        client.print("<td>\377C</td>");
-      client.print("</tr>");    
-
-     
-
-//za krbovou vlozkou
-    client.print("<tr>");
-      client.print("<td>Za krbovou vlozkou</td>");
-           client.print( "<td>");
-           client.print(Tzakrbem);
-           client.print("</td>");
-
-           client.print("<td>");
-    client.print(m_Tzakrbem);
-    client.print("</td>");
-
-        client.print("<td>");
-    client.print(M_Tzakrbem);
-    client.print("</td>");
       client.print("<td>\377C</td>");
     client.print("</tr>");     
  
     client.print("<tr>");
-      client.print("<td>Za krbovou vlozkou</td>");
+      client.print("<td>Technická</td>");
            client.print( "<td>");
-           client.print(Hzakrbem);
+           client.print(hodnoty[7]);
            client.print("</td>");
                       client.print("<td>");
-    client.print(m_Hzakrbem);
+    client.print(minima[7]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_Hzakrbem);
+    client.print(maxima[7]);
+    client.print("</td>");
+
+           client.print("<td>");
+    client.print(a30min_hodnoty[7]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[7]);
     client.print("</td>");
 
     
@@ -1466,15 +1216,23 @@ client.print("</tr>");
     client.print("<tr>");
       client.print("<td>Koupelna</td>");
            client.print( "<td>");
-           client.print(Tkoupelna);
+           client.print(hodnoty[4]);
            client.print("</td>");
 
                       client.print("<td>");
-    client.print(m_Tkoupelna);
+    client.print(minima[4]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_Tkoupelna);
+    client.print(maxima[4]);
+    client.print("</td>");
+
+               client.print("<td>");
+    client.print(a30min_hodnoty[4]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[4]);
     client.print("</td>");
   
     
@@ -1484,49 +1242,74 @@ client.print("</tr>");
     client.print("<tr>");
       client.print("<td>Koupenla</td>");
            client.print( "<td>");
-           client.print(Hkoupelna);
+           client.print(hodnoty[5]);
            client.print("</td>");
 
                                  client.print("<td>");
-    client.print(m_Hkoupelna);
+    client.print(minima[5]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_Hkoupelna);
+    client.print(maxima[5]);
+    client.print("</td>");
+
+               client.print("<td>");
+    client.print(a30min_hodnoty[5]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[5]);
     client.print("</td>");
     
       client.print("<td>% rel</td>");
     client.print("</tr>");
 
-//technicka
+//za krbem
     client.print("<tr>");
-      client.print("<td>Technicka</td>");
+      client.print("<td>TZa krbem</td>");
            client.print( "<td>");
-           client.print(Ttechnicka);
+           client.print(hodnoty[8]);
            client.print("</td>");
 
                                  client.print("<td>");
-    client.print(m_Ttechnicka);
+    client.print(minima[8]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_Ttechnicka);
+    client.print(maxima[8]);
     client.print("</td>");
+
+           client.print("<td>");
+    client.print(a30min_hodnoty[8]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[8]);
+    client.print("</td>");
+    
     
       client.print("<td>\377C</td>");
     client.print("</tr>");
 
     client.print("<tr>");
-      client.print("<td>Technicka</td>");
+      client.print("<td>Za krbem</td>");
            client.print( "<td>");
-           client.print(Htechnicka);
+           client.print(hodnoty[9]);
            client.print("</td>");
     client.print("<td>");
-               client.print(m_Htechnicka);
+               client.print(minima[9]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_Htechnicka);
+    client.print(maxima[9]);
+    client.print("</td>");
+
+               client.print("<td>");
+    client.print(a30min_hodnoty[9]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[9]);
     client.print("</td>");
     
       client.print("<td>% rel</td>");
@@ -1536,19 +1319,27 @@ client.print("</tr>");
     client.print("<tr>");
       client.print("<td>Podlaha obyvak</td>");
            client.print( "<td>");
-           client.print(T5);
+           client.print(hodnoty[16]);
            client.print("</td>");
     client.print("<td>");
-               client.print(m_T5);
+               client.print(minima[16]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_T5);
+    client.print(maxima[16]);
+    client.print("</td>");
+
+               client.print("<td>");
+    client.print(a30min_hodnoty[16]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[16]);
     client.print("</td>");
     
       client.print("<td>\377C</td>");
     client.print("</tr>");    
-
+/*
 // podlaha pokoj
     client.print("<tr>");
       client.print("<td>Podlaha pokoj nahore</td>");
@@ -1565,7 +1356,7 @@ client.print("</tr>");
         
       client.print("<td>\377C</td>");
     client.print("</tr>") ; 
-
+*/
 //mezera
 client.print("<tr>");
 client.print("<td></td>");
@@ -1573,38 +1364,115 @@ client.print("<td></td>");
 client.print("<td></td>");
         client.print("<td> </td>");
             client.print("<td> </td>");
+            client.print("<td> </td>");
 client.print("</tr>");
 
-// ČOV T9
+// ČOV T9 - předěláno na přípojku do špejcharu
     client.print("<tr>");
-      client.print("<td>COV voda</td>");
+      client.print("<td>pripojka starobinec</td>");
            client.print( "<td>");
-           client.print(T9);
+           client.print(hodnoty[20]);
            client.print("</td>");
     client.print("<td>");
-                          client.print(m_T9);
+                          client.print(minima[20]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_T9);
+    client.print(maxima[20]);
       client.print("</td>");
+
+      
+               client.print("<td>");
+    client.print(a30min_hodnoty[20]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[20]);
+    client.print("</td>");
+    
       
       client.print("<td>\377C</td>");
     client.print("</tr>");  
-
-// ČOV T14
+    
+// dešťovka
     client.print("<tr>");
-      client.print("<td>COV vzduch</td>");
+      client.print("<td>destovka - vyska vody</td>");
            client.print( "<td>");
-           client.print(T14);
+           client.print(hodnoty[22]);
            client.print("</td>");
-  client.print("<td>");
-                          client.print(m_T14);
+    client.print("<td>");
+                          client.print(minima[22]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_T14);
+    client.print(maxima[22]);
       client.print("</td>");
+
+
+               client.print("<td>");
+    client.print(a30min_hodnoty[22]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[22]);
+    client.print("</td>");
+          
+      
+      client.print("<td>cm</td>");
+    client.print("</tr>");  
+
+// dešťovka litry
+
+int litry_vody = (180-hodnoty[22]) *6.15;
+hodnoty[23] = litry_vody;
+    client.print("<tr>");
+      client.print("<td>destovka - objem</td>");
+           client.print( "<td>");
+           client.print(hodnoty[23]);
+           client.print("</td>");
+    client.print("<td>");
+                          client.print(minima[23]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(maxima[23]);
+      client.print("</td>");
+
+
+               client.print("<td>");
+    client.print(a30min_hodnoty[23]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[23]);
+    client.print("</td>");
+          
+      
+      client.print("<td>litry</td>");
+    client.print("</tr>");
+
+// ČOV T14
+    client.print("<tr>");
+      client.print("<td>destovak - teplota</td>");
+           client.print( "<td>");
+           client.print(hodnoty[17]);
+           client.print("</td>");
+  client.print("<td>");
+                          client.print(minima[17]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(maxima[17]);
+      client.print("</td>");
+
+               client.print("<td>");
+    client.print(a30min_hodnoty[17]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[17]);
+    client.print("</td>");
+          
     
       client.print("<td>\377C</td>");
     client.print("</tr>") ;
@@ -1613,20 +1481,30 @@ client.print("</tr>");
     client.print("<tr>");
       client.print("<td>Vodomer</td>");
            client.print( "<td>");
-           client.print(T10);
+           client.print(hodnoty[18]);
            client.print("</td>");
   client.print("<td>");
-                          client.print(m_T10);
+                          client.print(minima[18]);
     client.print("</td>");
 
         client.print("<td>");
-    client.print(M_T10);
+    client.print(maxima[18]);
       client.print("</td>");
+
+      
+               client.print("<td>");
+    client.print(a30min_hodnoty[18]);
+    client.print("</td>");
+
+        client.print("<td>");
+    client.print(a12h_hodnoty[18]);
+    client.print("</td>");
+          
       
       client.print("<td>\377C</td>");
     client.print("</tr>") ;    
 
-
+/*
 //ČOV stav
 
 
@@ -1710,6 +1588,7 @@ if (topit_loznice == true){
 } else {
     client.print("<td>NE</td>");
 }
+*/
 client.print("<td></td>");
           client.print("</tr>");                 
                  
@@ -1768,7 +1647,7 @@ MAX6675 thermocouple(thermoCLK, thermoCS, thermoDO);
    Serial.print("C = "); 
    float TSP=(thermocouple.readCelsius());
    Serial.println(TSP);
-Tspaliny=TSP;
+hodnoty[10]=TSP;
 
     }
   }
@@ -1782,7 +1661,10 @@ delejWEB pauza4(500);
 ctiDS pauza5(5000);
 smazmM pauza6(86400000);
 smazmM_jednou pauza7(30000);
-topeni pauza8 (600000);
+//topeni pauza8 (600000);
+Cti_destovka pauza9 (60000);
+a30min pauza10(900000);
+a12hodin pauza11(21600000);
 
 void setup(){
 
@@ -1825,13 +1707,7 @@ Serial.print("Probe MPL3115A2: ");
     // onetime-measure:
     mpl3115.setEnabled(0);
     mpl3115.triggerMeasurement();
-    
-  pinMode(pin_COV, OUTPUT);
-    pinMode(pin_krb, OUTPUT);
-      pinMode(pin_kotel, OUTPUT);
-        pinMode(pin_obyvak, OUTPUT);
-          pinMode(pin_pracovna, OUTPUT);
-            pinMode(pin_loznice, OUTPUT);
+
     smazmM pauza6(0);
 
     
@@ -1846,305 +1722,78 @@ void loop(){
   pauza5.Update();
   pauza6.Update(); 
   pauza7.Update();
-  pauza8.Update();
-
- COV();
- aktualizacemM();
-
-  
-}
- 
-
-
-  // ČOV---------------------------------------------------------------------------
-
-  void COV(){
-        unsigned long now = millis();
-
-        if(stateMainLoop && now - lastTimeMainLoop >= loopOn) {
-                // it is time to stop main loop
-                lastTimeMainLoop = now;
-                lastTimeSubLoop = now;
-                stateSubLoop = false;
-                stateMainLoop = false;
-                doMailLoopStop();
-        }else if (!stateMainLoop && now - lastTimeMainLoop >= loopOff ) {
-                // time to start main loop
-                lastTimeMainLoop = now;
-                stateMainLoop = true;
-                // if is running sub loop -> force to kill before start main loop
-                if(stateSubLoop) {
-                        doSubLoopStop();
-                        stateSubLoop = false;
-
-                        
-                }
-                
-                doMainLoopStart();
-        }
-        
-
-        if(!stateMainLoop) {
-
-                if(stateSubLoop && now - lastTimeSubLoop >= subLoopOn) {
-                        lastTimeSubLoop = now;
-                        stateSubLoop = false;
-                        doSubLoopStop();
-                }else if(!stateSubLoop && now - lastTimeSubLoop >= subLoopOff) {
-                        lastTimeSubLoop = now;
-                        stateSubLoop = true;
-                        doSubLoopStart();
-                }
-        }
-
+//  pauza8.Update();
+  pauza9.Update();
+    pauza10.Update();
+      pauza11.Update();
+aktualizacemM;
 }
 
+/*
+ void ultrazvuk(){
+  // načtení vzdálenosti v centimetrech do vytvořené proměnné vzdalenost
+  int vzdalenost = sonar.ping_cm();
+  // pauza před dalším měřením
+  delay(50);
+  // pokud byla detekována vzdálenost větší než 0,
+  // provedeme další měření
+  if (vzdalenost > 0) {
+    vzdalenost = 0;
+    // pro získání stabilnějších výsledků provedeme 5 měření
+    // a výsledky budeme přičítat do proměnné vzdalenost
+    for(int i=0; i<5; i++) {
+      vzdalenost += sonar.ping_cm();
+      delay(50);
+    }
+    // v proměnné vzdálenost máme součet posledních 5 měření
+    // a musíme tedy provést dělení 5 pro získání průměru
+    vzdalenost = vzdalenost/5;
+    // vytištění informací po sériové lince
+    Serial.print("Vzdalenost mezi senzorem a predmetem je ");
+    Serial.print(vzdalenost);
+    Serial.println(" cm.");
+    hodnoty[22] = vzdalenost;
+  }
+  // pokud byla detekována vzdálenost 0, je předmět mimo měřící rozsah,
+  // tedy příliš blízko nebo naopak daleko
+  else {
+    Serial.println("Vzdalenost mezi senzorem a predmetem je mimo merici rozsah.");
+    delay(500);
+  }
+ }
 
-void doMainLoopStart(){
-        Serial.println("Start main loop"); // start red
-        digitalWrite(pin_COV, HIGH);
-        stav_COV = 1;
-}
-
-void doMailLoopStop(){
-        Serial.println("Stop main loop"); // end red
-        digitalWrite(pin_COV, LOW);
-        stav_COV =2;
-
-}
-void doSubLoopStart(){
-        Serial.println("Start sub loop"); // start yellow
-        digitalWrite(pin_COV, HIGH);
-        stav_COV=4;
-
-}
-
-void doSubLoopStop(){
-        Serial.println("Stop sub loop"); // end yellow
-        digitalWrite(pin_COV, LOW);
-        stav_COV=3;
-}
+*/
 
 void aktualizacemM(){
 
-  if(m_Tvenku1>Tvenku1){
-    m_Tvenku1=Tvenku1;
+for(int i =0; i++; 28)
+{
+  if (minima[i]>hodnoty[i])
+  {
+    minima[i] = hodnoty[i];
   }
-    if(M_Tvenku1<Tvenku1){
-    M_Tvenku1=Tvenku1;
-  }
-
-    if(m_Hvenku1>Hvenku1){
-    m_Hvenku1=Hvenku1;
-  }
-    if(M_Hvenku1<Hvenku1){
-    M_Hvenku1=Hvenku1;
-  }
-
-  if(m_Tvenku2>Tvenku2){
-    m_Tvenku2=Tvenku2;
-  }
-    if(M_Tvenku2<Tvenku2){
-    M_Tvenku2=Tvenku2;
-  }
-
-    if(m_Pvenku2>Pvenku2){
-    m_Pvenku2=Pvenku2;
-  }
-    if(M_Pvenku2<Pvenku2){
-    M_Pvenku2=Pvenku2;
-  }
-    if(m_Tkoupelna>Tkoupelna){
-    m_Tkoupelna=Tkoupelna;
-  }
-    if(M_Tkoupelna<Tkoupelna){
-    M_Tkoupelna=Tkoupelna;
-  }
-
-    if(m_Hkoupelna>Hkoupelna){
-    m_Hkoupelna=Hkoupelna;
-  }
-    if(M_Hkoupelna<Hkoupelna){
-    M_Hkoupelna=Hkoupelna;
-  }
-
-    if(m_Ttechnicka>Ttechnicka){
-    m_Ttechnicka=Ttechnicka;
-  }
-    if(M_Ttechnicka<Ttechnicka){
-    M_Ttechnicka=Ttechnicka;
-  }
-
-    if(m_Htechnicka>Htechnicka){
-    m_Htechnicka=Htechnicka;
-  }
-    if(M_Htechnicka<Htechnicka){
-    M_Htechnicka=Htechnicka;
-  }
-
-    if(m_Tzakrbem>Tzakrbem){
-    m_Tzakrbem=Tzakrbem;
-  }
-    if(M_Tzakrbem<Tzakrbem){
-    M_Tzakrbem=Tzakrbem;
-  }
-
-    if(m_Hzakrbem>Hzakrbem){
-    m_Hzakrbem=Hzakrbem;
-  }
-    if(M_Hzakrbem<Hzakrbem){
-    M_Hzakrbem=Hzakrbem;
-  }
-
-    if(m_Tspaliny>Tspaliny){
-    m_Tspaliny=Tspaliny;
-  }
-    if(M_Tspaliny<Tspaliny){
-    M_Tspaliny=Tspaliny;
-  }
-
-    if(m_T1>T1){
-    m_T1=T1;
-  }
-    if(M_T1<T1){
-    M_T1=T1;
-  }
-
-    if(m_T2>T2){
-    m_T2=T2;
-  }
-    if(M_T2<T2){
-    M_T2=T2;
-  }
-    if(m_T3>T3){
-    m_T3=T3;
-  }
-    if(M_T3<T3){
-    M_T3=T3;
-  }
-
-    if(m_T4>T4){
-    m_T4=T4;
-  }
-    if(M_T4<T4){
-    M_T4=T4;
-  }
-
-        if(m_T5>T5){
-    m_T5=T5;
-  }
-    if(M_T5<T5){
-    M_T5=T5;
-  }
-
-       if(m_T6>T6){
-    m_T6=T6;
-  }
-    if(M_T6<T6){
-    M_T6=T6;
-  }
-
-       if(m_T7>T7){
-    m_T7=T7;
-  }
-    if(M_T7<T7){
-    M_T7=T7;
-  }
-
-       if(m_T8>T8){
-    m_T8=T8;
-  }
-    if(M_T8<T8){
-    M_T8=T8;
-  }
-     if(m_T9>T9){
-    m_T9=T9;
-  }
-    if(M_T9<T9){
-    M_T9=T9;
-  }
-
-      if(m_T10>T10){
-    m_T10=T10;
-  }
-    if(M_T10<T10){
-    M_T10=T10;
-  }
-
-      if(m_T11>T11){
-    m_T11=T11;
-  }
-    if(M_T11<T11){
-    M_T11=T11;
-  }
-
-      if(m_T12>T12){
-    m_T12=T12;
-  }
-    if(M_T12<T12){
-    M_T12=T12;
-  }
-      if(m_T13>T13){
-    m_T13=T13;
-  }
-    if(M_T13<T13){
-    M_T13=T13;
-  }
-
-       if(m_T14>T14){
-    m_T14=T14;
-  }
-    if(M_T14<T14){
-    M_T14=T14;
-  }
-
-       if(m_pct_naplneny_zas>pct_naplneny_zas){
-    m_pct_naplneny_zas=pct_naplneny_zas;
-  }
-    if(M_pct_naplneny_zas<pct_naplneny_zas){
-    M_pct_naplneny_zas=pct_naplneny_zas;
-  }
-
-    if(m_kWh_zas>kWh_zas){
-    m_kWh_zas=kWh_zas;
-  }
-    if(M_kWh_zas<kWh_zas){
-    M_kWh_zas=kWh_zas;
-  }
-
-       if(m_Tobyvak>Tobyvak){
-    m_Tobyvak=Tobyvak;
-  }
-    if(M_Tobyvak<Tobyvak){
-    M_Tobyvak=Tobyvak;
-  }
-
-         if(m_Tloznice>Tloznice){
-    m_Tloznice=Tloznice;
-  }
-    if(M_Tloznice<Tloznice){
-    M_Tloznice=Tloznice;
-  }
-         if(m_Tpracovna>Tpracovna){
-    m_Tpracovna=Tpracovna;
-  }
-    if(M_Tpracovna<Tpracovna){
-    M_Tpracovna=Tpracovna;
-  }
-         if(m_Tpokoj>Tpokoj){
-    m_Tpokoj=Tpokoj;
-  }
-    if(M_Tpokoj<Tpokoj){
-    M_Tpokoj=Tpokoj;
+  if (maxima[i]<hodnoty[i])
+  {
+    maxima[i]=hodnoty[i];
   }
 }
-
- 
-  
+}
 
 
 
-// změny -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+
+
+/* změny -*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-
+ 3.0
+-přidán ultrazvuk
+-přidána teplota vody
+-opravena teplota u přípojky
+-přidány 30min a 12h hodnoty
+-proměnné přesunuty do polí
+-odstraněny nevyužité části kódu
+
+*/
+
 /* 2.9
 -oprava tabulky
 -aktivace teploměrů obývák, ložnice
